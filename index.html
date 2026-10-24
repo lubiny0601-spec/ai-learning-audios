@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AI 学习音频随身听 | 沉浸式收听库</title>
+  <meta name="description" content="专为AI与大模型课程打造的极简高效音频播放器，支持3x倍速、断点续播、锁屏控制">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- 背景氛围光影 -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <div class="app-layout">
+    <!-- 顶栏导航 -->
+    <header class="app-header">
+      <div class="header-left">
+        <img src="assets/logo.svg" alt="Logo" class="app-logo">
+        <div>
+          <h1 class="app-title">AI 学习音频库</h1>
+          <p class="app-subtitle">深度学习 · 大模型 · 智能体前沿音频整理</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <span class="badge" id="audioCountBadge">13 期音频</span>
+        <button class="icon-btn" id="shortcutsBtn" title="键盘快捷键" aria-label="快捷键说明">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="4" width="20" height="16" rx="2" />
+            <path d="M6 8h.001M10 8h.001M14 8h.001M18 8h.001M8 12h.001M12 12h.001M16 12h.001M7 16h10" />
+          </svg>
+        </button>
+        <button class="icon-btn" id="sleepTimerBtn" title="定时关闭" aria-label="睡眠定时器">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <span class="timer-tag" id="timerTag" style="display: none;">30m</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 主体双栏内容 -->
+    <main class="main-content">
+      <!-- 左栏：音频列表与搜索筛选 -->
+      <section class="list-section">
+        <div class="search-bar-wrap">
+          <div class="search-input-box">
+            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input type="text" id="searchInput" placeholder="搜索音频名称、章节、大模型、智能体..." autocomplete="off">
+            <button class="clear-search-btn" id="clearSearchBtn" style="display: none;" title="清空搜索">✕</button>
+          </div>
+        </div>
+
+        <div class="list-header-info">
+          <span id="filteredCount">全部音频</span>
+          <div class="list-actions">
+            <button class="text-btn" id="sortOrderBtn" title="切换正序/倒序">序号排序 ↕</button>
+          </div>
+        </div>
+
+        <!-- 音频列表容器 -->
+        <div class="playlist-container" id="playlistContainer">
+          <!-- 动态渲染音频卡片 -->
+          <div class="loading-state" id="loadingState">
+            <div class="spinner"></div>
+            <p>正在载入音频库...</p>
+          </div>
+        </div>
+
+        <!-- 底部本地拖拽音频试听提示 -->
+        <div class="drop-zone" id="dropZone">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          <span>将桌面新 .m4a 拖入此处可直接本地即时试听</span>
+          <input type="file" id="localFileInput" accept=".m4a,audio/*" style="display: none;">
+        </div>
+      </section>
+
+      <!-- 右栏/底栏：核心控制台与沉浸播放器 -->
+      <aside class="player-section" id="playerSection">
+        <div class="player-card">
+          <!-- 顶部状态与动态波形 -->
+          <div class="player-header">
+            <div class="waveform-box" id="waveformBox">
+              <span class="bar bar-1"></span>
+              <span class="bar bar-2"></span>
+              <span class="bar bar-3"></span>
+              <span class="bar bar-4"></span>
+              <span class="bar bar-5"></span>
+              <span class="bar bar-6"></span>
+              <span class="bar bar-7"></span>
+            </div>
+            <span class="playing-status" id="playingStatus">准备就绪</span>
+          </div>
+
+          <!-- 当前曲目信息 -->
+          <div class="track-info">
+            <h2 class="track-title" id="currentTrackTitle">请选择要收听的音频</h2>
+            <div class="track-meta">
+              <span class="meta-tag" id="currentTrackSize">-- MB</span>
+              <span class="meta-tag" id="currentTrackProgressTag">尚未开始</span>
+            </div>
+          </div>
+
+          <!-- 进度条与时间显示 -->
+          <div class="progress-wrap">
+            <div class="progress-bar-container" id="progressBarContainer">
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBar" style="width: 0%;"></div>
+                <div class="progress-bar-handle" id="progressHandle" style="left: 0%;"></div>
+              </div>
+            </div>
+            <div class="time-display">
+              <span id="currentTime">00:00</span>
+              <span id="totalDuration">00:00</span>
+            </div>
+          </div>
+
+          <!-- 核心控制按钮群 -->
+          <div class="controls-row">
+            <!-- 播放模式切换 -->
+            <button class="control-btn" id="playModeBtn" title="播放模式：顺序播放">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="17 1 21 5 17 9" />
+                <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                <polyline points="7 23 3 19 7 15" />
+                <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+              </svg>
+            </button>
+
+            <!-- 快退 15 秒 -->
+            <button class="control-btn jump-btn" id="rewindBtn" title="后退 15 秒 (J)">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/>
+              </svg>
+              <span class="jump-label">-15s</span>
+            </button>
+
+            <!-- 主播放/暂停按钮 -->
+            <button class="control-btn main-play-btn" id="playPauseBtn" title="播放/暂停 (空格)">
+              <svg class="play-icon" id="playIcon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              <svg class="pause-icon" id="pauseIcon" style="display: none;" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="6" y="4" width="4" height="16"/>
+                <rect x="14" y="4" width="4" height="16"/>
+              </svg>
+            </button>
+
+            <!-- 快进 15 秒 -->
+            <button class="control-btn jump-btn" id="forwardBtn" title="快进 15 秒 (L)">
+              <span class="jump-label">+15s</span>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M13 17l5-5-5-5M6 17l5-5-5-5"/>
+              </svg>
+            </button>
+
+            <!-- 下一首 -->
+            <button class="control-btn" id="nextTrackBtn" title="下一首 (N)">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 4 15 12 5 20 5 4" fill="currentColor" />
+                <line x1="19" y1="5" x2="19" y2="19" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- 学习倍速选择区 -->
+          <div class="speed-control-box">
+            <span class="control-sublabel">学习倍速：</span>
+            <div class="speed-selector" id="speedSelector">
+              <button class="speed-pill" data-speed="0.75">0.75x</button>
+              <button class="speed-pill active" data-speed="1.0">1.0x</button>
+              <button class="speed-pill" data-speed="1.25">1.25x</button>
+              <button class="speed-pill" data-speed="1.5">1.5x</button>
+              <button class="speed-pill" data-speed="1.75">1.75x</button>
+              <button class="speed-pill" data-speed="2.0">2.0x</button>
+              <button class="speed-pill" data-speed="2.5">2.5x</button>
+              <button class="speed-pill" data-speed="3.0">3.0x</button>
+            </div>
+          </div>
+
+          <!-- 音量控制 -->
+          <div class="volume-box">
+            <button class="icon-btn small" id="muteBtn" title="静音/恢复">
+              <svg id="volumeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+              </svg>
+            </button>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="1" class="volume-slider">
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- 原生隐藏 audio 标签 -->
+  <audio id="audioPlayer" preload="metadata"></audio>
+
+  <!-- 睡眠定时弹层 -->
+  <div class="modal-overlay" id="timerModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>睡眠 / 专注定时关闭</h3>
+        <button class="close-modal-btn" id="closeTimerModal">✕</button>
+      </div>
+      <p class="modal-desc">设定倒计时，时间一到将平滑停止播放，保护设备电量与收听进度。</p>
+      <div class="timer-options">
+        <button class="timer-opt-btn" data-minutes="0">关闭定时</button>
+        <button class="timer-opt-btn" data-minutes="15">15 分钟</button>
+        <button class="timer-opt-btn" data-minutes="30">30 分钟</button>
+        <button class="timer-opt-btn" data-minutes="45">45 分钟</button>
+        <button class="timer-opt-btn" data-minutes="60">60 分钟</button>
+        <button class="timer-opt-btn" data-minutes="-1">播完当前音频后停止</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 快捷键指南弹层 -->
+  <div class="modal-overlay" id="shortcutsModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>键盘快捷键指南</h3>
+        <button class="close-modal-btn" id="closeShortcutsModal">✕</button>
+      </div>
+      <div class="shortcuts-grid">
+        <div class="shortcut-item"><kbd>空格 (Space)</kbd><span>播放 / 暂停</span></div>
+        <div class="shortcut-item"><kbd>←</kbd> / <kbd>→</kbd><span>后退 / 快进 5 秒</span></div>
+        <div class="shortcut-item"><kbd>J</kbd> / <kbd>L</kbd><span>后退 / 快进 15 秒</span></div>
+        <div class="shortcut-item"><kbd>↑</kbd> / <kbd>↓</kbd><span>调高 / 调低音量</span></div>
+        <div class="shortcut-item"><kbd>[</kbd> / <kbd>]</kbd><span>降低 / 增加倍速</span></div>
+        <div class="shortcut-item"><kbd>M</kbd><span>静音 / 恢复</span></div>
+        <div class="shortcut-item"><kbd>N</kbd><span>下一首音频</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
