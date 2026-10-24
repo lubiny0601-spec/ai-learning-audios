@@ -1,0 +1,119 @@
+[
+  {
+    "id": "audio-01",
+    "filename": "1.微调与部署：从文字接龙到本地部署.m4a",
+    "title": "1.微调与部署：从文字接龙到本地部署",
+    "url": "audio/1.%E5%BE%AE%E8%B0%83%E4%B8%8E%E9%83%A8%E7%BD%B2%EF%BC%9A%E4%BB%8E%E6%96%87%E5%AD%97%E6%8E%A5%E9%BE%99%E5%88%B0%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2.m4a",
+    "size": 47803122,
+    "sizeFormatted": "45.59 MB",
+    "order": 1
+  },
+  {
+    "id": "audio-02",
+    "filename": "2.提示学习与思维链：大模型思维链的底层逻辑.m4a",
+    "title": "2.提示学习与思维链：大模型思维链的底层逻辑",
+    "url": "audio/2.%E6%8F%90%E7%A4%BA%E5%AD%A6%E4%B9%A0%E4%B8%8E%E6%80%9D%E7%BB%B4%E9%93%BE%EF%BC%9A%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%80%9D%E7%BB%B4%E9%93%BE%E7%9A%84%E5%BA%95%E5%B1%82%E9%80%BB%E8%BE%91.m4a",
+    "size": 46354898,
+    "sizeFormatted": "44.21 MB",
+    "order": 2
+  },
+  {
+    "id": "audio-03",
+    "filename": "3.大语言模型知识编辑：AI大模型精准记忆手术.m4a",
+    "title": "3.大语言模型知识编辑：AI大模型精准记忆手术",
+    "url": "audio/3.%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9F%A5%E8%AF%86%E7%BC%96%E8%BE%91%EF%BC%9AAI%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%B2%BE%E5%87%86%E8%AE%B0%E5%BF%86%E6%89%8B%E6%9C%AF.m4a",
+    "size": 58660789,
+    "sizeFormatted": "55.94 MB",
+    "order": 3
+  },
+  {
+    "id": "audio-04",
+    "filename": "第04章_数学推理;教大模型做数学.m4a",
+    "title": "第04章_数学推理;教大模型做数学",
+    "url": "audio/%E7%AC%AC04%E7%AB%A0_%E6%95%B0%E5%AD%A6%E6%8E%A8%E7%90%86%3B%E6%95%99%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%81%9A%E6%95%B0%E5%AD%A6.m4a",
+    "size": 43592799,
+    "sizeFormatted": "41.57 MB",
+    "order": 4
+  },
+  {
+    "id": "audio-05",
+    "filename": "第05章_模型水印;AI文本隐形水印攻防.m4a",
+    "title": "第05章_模型水印;AI文本隐形水印攻防",
+    "url": "audio/%E7%AC%AC05%E7%AB%A0_%E6%A8%A1%E5%9E%8B%E6%B0%B4%E5%8D%B0%3BAI%E6%96%87%E6%9C%AC%E9%9A%90%E5%BD%A2%E6%B0%B4%E5%8D%B0%E6%94%BB%E9%98%B2.m4a",
+    "size": 33941316,
+    "sizeFormatted": "32.37 MB",
+    "order": 5
+  },
+  {
+    "id": "audio-06",
+    "filename": "第06章_越狱攻击;大模型奶奶漏洞.m4a",
+    "title": "第06章_越狱攻击;大模型奶奶漏洞",
+    "url": "audio/%E7%AC%AC06%E7%AB%A0_%E8%B6%8A%E7%8B%B1%E6%94%BB%E5%87%BB%3B%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%A5%B6%E5%A5%B6%E6%BC%8F%E6%B4%9E.m4a",
+    "size": 31464703,
+    "sizeFormatted": "30.01 MB",
+    "order": 6
+  },
+  {
+    "id": "audio-07",
+    "filename": "第07章_大模型隐写,大模型文字里的隐写术.m4a",
+    "title": "第07章_大模型隐写,大模型文字里的隐写术",
+    "url": "audio/%E7%AC%AC07%E7%AB%A0_%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%90%E5%86%99%2C%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%96%87%E5%AD%97%E9%87%8C%E7%9A%84%E9%9A%90%E5%86%99%E6%9C%AF.m4a",
+    "size": 47719454,
+    "sizeFormatted": "45.51 MB",
+    "order": 7
+  },
+  {
+    "id": "audio-08",
+    "filename": "第08章_多模态模型,AI长出眼睛的底层逻辑.m4a",
+    "title": "第08章_多模态模型,AI长出眼睛的底层逻辑",
+    "url": "audio/%E7%AC%AC08%E7%AB%A0_%E5%A4%9A%E6%A8%A1%E6%80%81%E6%A8%A1%E5%9E%8B%2CAI%E9%95%BF%E5%87%BA%E7%9C%BC%E7%9D%9B%E7%9A%84%E5%BA%95%E5%B1%82%E9%80%BB%E8%BE%91.m4a",
+    "size": 36044295,
+    "sizeFormatted": "34.37 MB",
+    "order": 8
+  },
+  {
+    "id": "audio-09",
+    "filename": "第09章_GUI 智能体,AI学会自己操作屏幕了.m4a",
+    "title": "第09章_GUI 智能体,AI学会自己操作屏幕了",
+    "url": "audio/%E7%AC%AC09%E7%AB%A0_GUI%20%E6%99%BA%E8%83%BD%E4%BD%93%2CAI%E5%AD%A6%E4%BC%9A%E8%87%AA%E5%B7%B1%E6%93%8D%E4%BD%9C%E5%B1%8F%E5%B9%95%E4%BA%86.m4a",
+    "size": 46748703,
+    "sizeFormatted": "44.58 MB",
+    "order": 9
+  },
+  {
+    "id": "audio-10",
+    "filename": "第10章_智能体安全,当心AI智能体在现实中闯祸.m4a",
+    "title": "第10章_智能体安全,当心AI智能体在现实中闯祸",
+    "url": "audio/%E7%AC%AC10%E7%AB%A0_%E6%99%BA%E8%83%BD%E4%BD%93%E5%AE%89%E5%85%A8%2C%E5%BD%93%E5%BF%83AI%E6%99%BA%E8%83%BD%E4%BD%93%E5%9C%A8%E7%8E%B0%E5%AE%9E%E4%B8%AD%E9%97%AF%E7%A5%B8.m4a",
+    "size": 55308414,
+    "sizeFormatted": "52.75 MB",
+    "order": 10
+  },
+  {
+    "id": "audio-11",
+    "filename": "第11章_RLHF 安全对齐,大模型如何对齐人类.m4a",
+    "title": "第11章_RLHF 安全对齐,大模型如何对齐人类",
+    "url": "audio/%E7%AC%AC11%E7%AB%A0_RLHF%20%E5%AE%89%E5%85%A8%E5%AF%B9%E9%BD%90%2C%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%A6%82%E4%BD%95%E5%AF%B9%E9%BD%90%E4%BA%BA%E7%B1%BB.m4a",
+    "size": 25484065,
+    "sizeFormatted": "24.3 MB",
+    "order": 11
+  },
+  {
+    "id": "audio-12",
+    "filename": "大模型变身智能体.m4a",
+    "title": "大模型变身智能体",
+    "url": "audio/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%8F%98%E8%BA%AB%E6%99%BA%E8%83%BD%E4%BD%93.m4a",
+    "size": 47152220,
+    "sizeFormatted": "44.97 MB",
+    "order": 100
+  },
+  {
+    "id": "audio-13",
+    "filename": "AI_Agent_生产级架构公式.m4a",
+    "title": "AI_Agent_生产级架构公式",
+    "url": "audio/AI_Agent_%E7%94%9F%E4%BA%A7%E7%BA%A7%E6%9E%B6%E6%9E%84%E5%85%AC%E5%BC%8F.m4a",
+    "size": 30317650,
+    "sizeFormatted": "28.91 MB",
+    "order": 100
+  }
+]
