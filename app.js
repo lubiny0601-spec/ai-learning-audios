@@ -1,5 +1,6 @@
 /**
- * AI 学习音频随身听 - 核心播放引擎、断点记忆与教材库联动
+ * AI 学习音频随身听 - 核心播放引擎、移动端稳健性与教材讲义内嵌联动
+ * (Impeccable Production Grade)
  */
 
 (function () {
@@ -9,11 +10,11 @@
   // 常量与配置
   // ==========================================
   const STORAGE_KEYS = {
-    PROGRESS: 'ai_audio_progress_v1',
-    SPEED: 'ai_audio_speed_v1',
-    LAST_ID: 'ai_audio_last_id_v1',
-    PLAY_MODE: 'ai_audio_play_mode_v1',
-    VOLUME: 'ai_audio_volume_v1'
+    PROGRESS: 'ai_audio_progress_v2',
+    SPEED: 'ai_audio_speed_v2',
+    LAST_ID: 'ai_audio_last_id_v2',
+    PLAY_MODE: 'ai_audio_play_mode_v2',
+    VOLUME: 'ai_audio_volume_v2'
   };
 
   const PLAY_MODES = ['sequential', 'all-repeat', 'single-repeat'];
@@ -35,6 +36,7 @@
     currentIndex: -1,
     currentTrack: null,
     isPlaying: false,
+    isBuffering: false,
     playMode: localStorage.getItem(STORAGE_KEYS.PLAY_MODE) || 'sequential',
     playbackSpeed: parseFloat(localStorage.getItem(STORAGE_KEYS.SPEED)) || 1.0,
     searchKeyword: '',
@@ -43,7 +45,8 @@
     sleepTimerRemaining: 0,
     stopOnTrackEnd: false,
     progressMap: JSON.parse(localStorage.getItem(STORAGE_KEYS.PROGRESS) || '{}'),
-    isDraggingProgress: false
+    isDraggingProgress: false,
+    targetResumeTime: 0
   };
 
   // ==========================================
@@ -57,14 +60,20 @@
     filteredCount: document.getElementById('filteredCount'),
     sortOrderBtn: document.getElementById('sortOrderBtn'),
     audioCountBadge: document.getElementById('audioCountBadge'),
+    audioErrorBanner: document.getElementById('audioErrorBanner'),
+    audioErrorMsg: document.getElementById('audioErrorMsg'),
+    audioRetryBtn: document.getElementById('audioRetryBtn'),
     
     // 播放器主界面
+    playerCard: document.getElementById('playerCard'),
     waveformBox: document.getElementById('waveformBox'),
     playingStatus: document.getElementById('playingStatus'),
     currentTrackTitle: document.getElementById('currentTrackTitle'),
     currentTrackSize: document.getElementById('currentTrackSize'),
     currentTrackProgressTag: document.getElementById('currentTrackProgressTag'),
+    heroPdfBox: document.getElementById('heroPdfBox'),
     currentTrackPdfBtn: document.getElementById('currentTrackPdfBtn'),
+    currentTrackPdfText: document.getElementById('currentTrackPdfText'),
     
     // 进度条
     progressBarContainer: document.getElementById('progressBarContainer'),
@@ -77,11 +86,13 @@
     playPauseBtn: document.getElementById('playPauseBtn'),
     playIcon: document.getElementById('playIcon'),
     pauseIcon: document.getElementById('pauseIcon'),
+    playSpinner: document.getElementById('playSpinner'),
     rewindBtn: document.getElementById('rewindBtn'),
     forwardBtn: document.getElementById('forwardBtn'),
     nextTrackBtn: document.getElementById('nextTrackBtn'),
     playModeBtn: document.getElementById('playModeBtn'),
     speedSelector: document.getElementById('speedSelector'),
+    currentSpeedVal: document.getElementById('currentSpeedVal'),
     
     // 音量与静音
     muteBtn: document.getElementById('muteBtn'),
@@ -91,6 +102,17 @@
     // 本地文件导入
     dropZone: document.getElementById('dropZone'),
     localFileInput: document.getElementById('localFileInput'),
+    
+    // 内置 PDF 阅读器
+    pdfReaderModal: document.getElementById('pdfReaderModal'),
+    pdfReaderTitle: document.getElementById('pdfReaderTitle'),
+    pdfIframe: document.getElementById('pdfIframe'),
+    pdfLoadingIndicator: document.getElementById('pdfLoadingIndicator'),
+    pdfExternalLink: document.getElementById('pdfExternalLink'),
+    pdfDownloadLink: document.getElementById('pdfDownloadLink'),
+    pdfDirectBtn: document.getElementById('pdfDirectBtn'),
+    pdfMobileFallback: document.getElementById('pdfMobileFallback'),
+    closePdfModal: document.getElementById('closePdfModal'),
     
     // 教材库
     booksBtn: document.getElementById('booksBtn'),
@@ -131,17 +153,20 @@
   }
 
   // ==========================================
-  // 初始化与数据加载
+  // 初始化与数据加载 (含防缓存机制)
   // ==========================================
   async function init() {
     setupEventListeners();
     setupMediaSession();
     restoreSettings();
 
+    // 防缓存时间戳，确保用户每次都能拿到最新的清单与讲义绑定
+    const cacheBuster = `t=${Date.now()}`;
+
     // 1. 加载音频清单
     try {
-      const response = await fetch('data/playlist.json');
-      if (!response.ok) throw new Error('Failed to load playlist.json');
+      const response = await fetch(`data/playlist.json?${cacheBuster}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       state.playlist = data;
       state.filteredList = [...data];
@@ -161,14 +186,14 @@
       console.error('音频清单加载异常:', err);
       elements.playlistContainer.innerHTML = `
         <div class="loading-state">
-          <p style="color: #ef4444;">音频清单加载失败，请刷新重试</p>
+          <p style="color: #ef4444;">音频清单加载异常，请检查网络或点击刷新</p>
         </div>
       `;
     }
 
     // 2. 加载教材书籍库
     try {
-      const booksRes = await fetch('data/books.json');
+      const booksRes = await fetch(`data/books.json?${cacheBuster}`);
       if (booksRes.ok) {
         state.books = await booksRes.json();
         elements.booksCountBadge.textContent = `${state.books.length}本`;
@@ -180,27 +205,24 @@
   }
 
   function restoreSettings() {
-    // 恢复音量
     const savedVolume = localStorage.getItem(STORAGE_KEYS.VOLUME);
-    if (savedVolume !== null) {
+    if (savedVolume !== null && elements.volumeSlider) {
       const vol = parseFloat(savedVolume);
       elements.audio.volume = vol;
       elements.volumeSlider.value = vol;
     }
-    // 恢复倍速
     setPlaybackSpeed(state.playbackSpeed);
-    // 恢复播放模式提示
     updatePlayModeUI();
   }
 
   // ==========================================
-  // 播放列表渲染与筛选
+  // 播放列表渲染与高可见度“讲义”按钮
   // ==========================================
   function renderPlaylist() {
     if (state.filteredList.length === 0) {
       elements.playlistContainer.innerHTML = `
         <div class="loading-state">
-          <p>没有找到匹配的音频</p>
+          <p>没有找到匹配的音频，请尝试其他关键词</p>
         </div>
       `;
       elements.filteredCount.textContent = '共 0 个结果';
@@ -223,38 +245,40 @@
           : `<span class="progress-pill">已学 ${pct}%</span>`;
       }
 
-      let pdfPill = '';
+      // 高可见度讲义按钮：直接在卡片上，电脑手机都能直接点
+      let pdfActionBtn = '';
       if (track.pdfUrl) {
-        pdfPill = `
-          <a href="${track.pdfUrl}" target="_blank" class="pdf-item-pill" title="查看配套讲义 PDF" onclick="event.stopPropagation()">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        pdfActionBtn = `
+          <button class="card-pdf-action" data-pdf="${track.pdfUrl}" data-title="${track.pdfTitle || track.title}" title="查看本章配套讲义 (PDF)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14 2 14 8 20 8"/>
             </svg>
             <span>讲义</span>
-          </a>
+          </button>
         `;
       }
 
       return `
         <div class="audio-card ${isActive ? 'active' : ''}" data-id="${track.id}">
           <div class="audio-card-left">
-            <span class="order-num">${track.order < 100 ? String(track.order).padStart(2, '0') : '#'}</span>
+            <div class="card-play-trigger" title="${isActive && state.isPlaying ? '暂停' : '播放'}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="${isActive && state.isPlaying ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                ${isActive && state.isPlaying 
+                  ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>' 
+                  : '<polygon points="5 3 19 12 5 21 5 3" fill="currentColor"/>'}
+              </svg>
+            </div>
             <div class="card-content">
               <div class="card-title" title="${track.title}">${track.title}</div>
               <div class="card-subtext">
                 <span>${track.sizeFormatted || ''}</span>
                 ${progressTag}
-                ${pdfPill}
               </div>
             </div>
           </div>
-          <div class="audio-card-right">
-            <svg class="play-indicator-icon" width="20" height="20" viewBox="0 0 24 24" fill="${isActive && state.isPlaying ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
-              ${isActive && state.isPlaying 
-                ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>' 
-                : '<polygon points="5 3 19 12 5 21 5 3"/>'}
-            </svg>
+          <div class="audio-card-actions">
+            ${pdfActionBtn}
           </div>
           ${pct > 0 ? `<div class="card-progress-line" style="width: ${pct}%;"></div>` : ''}
         </div>
@@ -283,6 +307,42 @@
   }
 
   // ==========================================
+  // 全屏/宽屏内嵌 PDF 讲义阅读器 (边听边看核心)
+  // ==========================================
+  function openPdfModal(pdfUrl, title) {
+    if (!pdfUrl) return;
+
+    elements.pdfReaderTitle.textContent = title || '配套讲义';
+    elements.pdfExternalLink.href = pdfUrl;
+    elements.pdfDownloadLink.href = pdfUrl;
+    elements.pdfDirectBtn.href = pdfUrl;
+    
+    // 显示加载指示
+    elements.pdfLoadingIndicator.style.display = 'flex';
+    elements.pdfReaderModal.style.display = 'flex';
+
+    // 设置 iframe 地址
+    elements.pdfIframe.src = pdfUrl;
+
+    elements.pdfIframe.onload = () => {
+      elements.pdfLoadingIndicator.style.display = 'none';
+    };
+
+    // 移动端安全回退判断
+    const isMobile = window.innerWidth <= 880;
+    if (isMobile) {
+      elements.pdfMobileFallback.style.display = 'flex';
+    } else {
+      elements.pdfMobileFallback.style.display = 'none';
+    }
+  }
+
+  function closePdfModal() {
+    elements.pdfReaderModal.style.display = 'none';
+    elements.pdfIframe.src = '';
+  }
+
+  // ==========================================
   // 教材资料库弹层渲染
   // ==========================================
   function renderBooksModal() {
@@ -296,20 +356,20 @@
         <div class="book-item-card ${book.isGeneral ? 'general' : ''}">
           <div class="book-info-left">
             <div class="book-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
               </svg>
             </div>
             <div class="book-title-wrap">
               <div class="book-title" title="${book.title}">${book.isGeneral ? '⭐ ' : ''}${book.title}</div>
-              <div class="book-size">${book.sizeFormatted} · PDF 格式</div>
+              <div class="book-size">${book.sizeFormatted} · PDF 教材</div>
             </div>
           </div>
           <div class="book-actions-right">
-            <a href="${book.url}" target="_blank" class="book-action-btn read-btn" title="在浏览器新标签页中打开阅读">
+            <button class="book-action-btn read-btn" data-url="${book.url}" data-title="${book.title}" title="在应用内打开阅读 (不断音)">
               在线阅读
-            </a>
+            </button>
             <a href="${book.url}" download="${book.filename}" class="book-action-btn download-btn" title="下载至本地">
               下载
             </a>
@@ -322,7 +382,7 @@
   }
 
   // ==========================================
-  // 核心播放控制
+  // 核心播放控制 (移动端深度加固)
   // ==========================================
   function loadTrack(index, autoPlay = true) {
     if (index < 0 || index >= state.playlist.length) return;
@@ -333,16 +393,20 @@
 
     localStorage.setItem(STORAGE_KEYS.LAST_ID, track.id);
 
+    // 隐藏之前的错误提示
+    elements.audioErrorBanner.style.display = 'none';
+
     elements.currentTrackTitle.textContent = track.title;
     elements.currentTrackTitle.title = track.title;
     elements.currentTrackSize.textContent = track.sizeFormatted || '';
 
-    // 检查是否有配套讲义
+    // 右侧大卡片上的本章讲义直达入口
     if (track.pdfUrl) {
-      elements.currentTrackPdfBtn.href = track.pdfUrl;
-      elements.currentTrackPdfBtn.style.display = 'inline-flex';
+      elements.heroPdfBox.style.display = 'block';
+      elements.currentTrackPdfText.textContent = `📖 查看《${track.pdfTitle || '本章配套讲义'}》`;
+      elements.currentTrackPdfBtn.onclick = () => openPdfModal(track.pdfUrl, track.pdfTitle || track.title);
     } else {
-      elements.currentTrackPdfBtn.style.display = 'none';
+      elements.heroPdfBox.style.display = 'none';
     }
 
     // 检查历史断点
@@ -357,6 +421,8 @@
       elements.currentTrackProgressTag.textContent = '首次收听';
     }
 
+    state.targetResumeTime = resumeTime;
+
     // 设置音频源
     elements.audio.src = track.url;
     elements.audio.playbackRate = state.playbackSpeed;
@@ -364,41 +430,43 @@
       elements.audio.preservesPitch = true;
     }
 
-    // 监听 loadedmetadata 恢复进度
-    const onLoadedMetadata = () => {
-      elements.totalDuration.textContent = formatTime(elements.audio.duration);
-      if (resumeTime > 0 && resumeTime < elements.audio.duration) {
-        elements.audio.currentTime = resumeTime;
-        updateProgressUI(resumeTime, elements.audio.duration);
-      }
-      elements.audio.removeEventListener('loadedmetadata', onLoadedMetadata);
-    };
-    elements.audio.addEventListener('loadedmetadata', onLoadedMetadata);
-
     updateMediaSessionMetadata(track);
     renderPlaylist();
 
     if (autoPlay) {
       playAudio();
     } else {
-      pauseAudio();
+      updatePlayStateUI();
     }
   }
 
   function playAudio() {
-    elements.audio.play().then(() => {
-      state.isPlaying = true;
-      updatePlayStateUI();
-    }).catch(err => {
-      console.warn('播放被阻止或失败:', err);
-      state.isPlaying = false;
-      updatePlayStateUI();
-    });
+    setBufferingState(true);
+    elements.audioErrorBanner.style.display = 'none';
+
+    const playPromise = elements.audio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        state.isPlaying = true;
+        setBufferingState(false);
+        updatePlayStateUI();
+      }).catch(err => {
+        console.warn('播放需要用户交互或被拦截:', err);
+        state.isPlaying = false;
+        setBufferingState(false);
+        updatePlayStateUI();
+        
+        // 呈现友好重试提示
+        elements.audioErrorMsg.textContent = '点击此处继续播放该章节音频';
+        elements.audioErrorBanner.style.display = 'flex';
+      });
+    }
   }
 
   function pauseAudio() {
     elements.audio.pause();
     state.isPlaying = false;
+    setBufferingState(false);
     updatePlayStateUI();
   }
 
@@ -414,7 +482,21 @@
     }
   }
 
+  function setBufferingState(buffering) {
+    state.isBuffering = buffering;
+    if (buffering) {
+      elements.playSpinner.style.display = 'block';
+      elements.playIcon.style.display = 'none';
+      elements.pauseIcon.style.display = 'none';
+      elements.playingStatus.textContent = '正在缓冲...';
+    } else {
+      elements.playSpinner.style.display = 'none';
+    }
+  }
+
   function updatePlayStateUI() {
+    if (state.isBuffering) return;
+
     if (state.isPlaying) {
       elements.playIcon.style.display = 'none';
       elements.pauseIcon.style.display = 'block';
@@ -481,6 +563,10 @@
     }
     localStorage.setItem(STORAGE_KEYS.SPEED, speed);
 
+    if (elements.currentSpeedVal) {
+      elements.currentSpeedVal.textContent = `${speed}x`;
+    }
+
     const buttons = elements.speedSelector.querySelectorAll('.speed-pill');
     buttons.forEach(btn => {
       const s = parseFloat(btn.dataset.speed);
@@ -500,7 +586,7 @@
   // ==========================================
   function updateProgressUI(current, duration) {
     elements.currentTime.textContent = formatTime(current);
-    if (duration && !isNaN(duration)) {
+    if (duration && !isNaN(duration) && duration > 0) {
       elements.totalDuration.textContent = formatTime(duration);
       const pct = Math.min(100, (current / duration) * 100);
       elements.progressBar.style.width = `${pct}%`;
@@ -628,7 +714,7 @@
       navigator.mediaSession.setActionHandler('previoustrack', () => playPreviousTrack());
       navigator.mediaSession.setActionHandler('nexttrack', () => playNextTrack());
     } catch (e) {
-      console.warn('MediaSession action handler error:', e);
+      console.warn('MediaSession handler warning:', e);
     }
   }
 
@@ -669,7 +755,7 @@
   }
 
   // ==========================================
-  // 事件监听绑定
+  // 事件监听绑定 (移动端无缝交互)
   // ==========================================
   function setupEventListeners() {
     // 播放/暂停
@@ -679,7 +765,52 @@
     elements.nextTrackBtn.addEventListener('click', playNextTrack);
     elements.playModeBtn.addEventListener('click', cyclePlayMode);
 
-    // 音频核心事件
+    // 重试按钮
+    elements.audioRetryBtn.addEventListener('click', () => {
+      if (state.currentTrack) {
+        elements.audio.load();
+        playAudio();
+      }
+    });
+
+    // 音频核心生命周期事件监听
+    elements.audio.addEventListener('loadstart', () => setBufferingState(true));
+    elements.audio.addEventListener('waiting', () => setBufferingState(true));
+    elements.audio.addEventListener('canplay', () => {
+      setBufferingState(false);
+      elements.totalDuration.textContent = formatTime(elements.audio.duration);
+      // 安全恢复历史断点 (必须在 canplay 之后)
+      if (state.targetResumeTime > 0 && elements.audio.duration && state.targetResumeTime < elements.audio.duration) {
+        try {
+          elements.audio.currentTime = state.targetResumeTime;
+        } catch (e) {
+          console.warn('Seek error:', e);
+        }
+        state.targetResumeTime = 0;
+      }
+    });
+
+    elements.audio.addEventListener('playing', () => {
+      state.isPlaying = true;
+      setBufferingState(false);
+      updatePlayStateUI();
+    });
+
+    elements.audio.addEventListener('pause', () => {
+      state.isPlaying = false;
+      setBufferingState(false);
+      updatePlayStateUI();
+    });
+
+    elements.audio.addEventListener('error', (e) => {
+      console.error('Audio load error:', e);
+      state.isPlaying = false;
+      setBufferingState(false);
+      updatePlayStateUI();
+      elements.audioErrorMsg.textContent = '音频连接中断，请检查网络或点击重试';
+      elements.audioErrorBanner.style.display = 'flex';
+    });
+
     elements.audio.addEventListener('timeupdate', () => {
       if (!state.isDraggingProgress) {
         updateProgressUI(elements.audio.currentTime, elements.audio.duration);
@@ -727,7 +858,6 @@
       window.addEventListener('mouseup', onMouseUp);
     });
 
-    // 触摸拖拽支持
     elements.progressBarContainer.addEventListener('touchstart', (e) => {
       state.isDraggingProgress = true;
       handleSeek(e);
@@ -739,8 +869,19 @@
       state.isDraggingProgress = false;
     });
 
-    // 列表项点击
+    // 播放列表项点击处理 (区分“点击卡片听音频”与“点击讲义按钮看讲义”)
     elements.playlistContainer.addEventListener('click', (e) => {
+      // 1. 如果点击的是“讲义”按钮
+      const pdfBtn = e.target.closest('.card-pdf-action');
+      if (pdfBtn) {
+        e.stopPropagation();
+        const pdfUrl = pdfBtn.dataset.pdf;
+        const title = pdfBtn.dataset.title;
+        openPdfModal(pdfUrl, title);
+        return;
+      }
+
+      // 2. 否则是点击卡片选择/播放音频
       const card = e.target.closest('.audio-card');
       if (!card) return;
       const trackId = card.dataset.id;
@@ -783,25 +924,30 @@
     });
 
     // 音量与静音
-    elements.volumeSlider.addEventListener('input', (e) => {
-      const val = parseFloat(e.target.value);
-      elements.audio.volume = val;
-      localStorage.setItem(STORAGE_KEYS.VOLUME, val);
-      updateVolumeIcon(val);
-    });
+    if (elements.volumeSlider) {
+      elements.volumeSlider.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        elements.audio.volume = val;
+        localStorage.setItem(STORAGE_KEYS.VOLUME, val);
+        updateVolumeIcon(val);
+      });
+    }
 
-    elements.muteBtn.addEventListener('click', () => {
-      if (elements.audio.volume > 0) {
-        elements.audio.volume = 0;
-        elements.volumeSlider.value = 0;
-      } else {
-        elements.audio.volume = 1;
-        elements.volumeSlider.value = 1;
-      }
-      updateVolumeIcon(elements.audio.volume);
-    });
+    if (elements.muteBtn) {
+      elements.muteBtn.addEventListener('click', () => {
+        if (elements.audio.volume > 0) {
+          elements.audio.volume = 0;
+          elements.volumeSlider.value = 0;
+        } else {
+          elements.audio.volume = 1;
+          elements.volumeSlider.value = 1;
+        }
+        updateVolumeIcon(elements.audio.volume);
+      });
+    }
 
     function updateVolumeIcon(vol) {
+      if (!elements.volumeIcon) return;
       if (vol === 0) {
         elements.volumeIcon.innerHTML = `
           <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
@@ -848,6 +994,23 @@
     });
     elements.booksModal.addEventListener('click', (e) => {
       if (e.target === elements.booksModal) elements.booksModal.style.display = 'none';
+    });
+
+    // 教材库内点击“在线阅读”
+    elements.booksGrid.addEventListener('click', (e) => {
+      const readBtn = e.target.closest('.book-action-btn.read-btn');
+      if (readBtn) {
+        const url = readBtn.dataset.url;
+        const title = readBtn.dataset.title;
+        elements.booksModal.style.display = 'none';
+        openPdfModal(url, title);
+      }
+    });
+
+    // PDF 阅读器关闭
+    elements.closePdfModal.addEventListener('click', closePdfModal);
+    elements.pdfReaderModal.addEventListener('click', (e) => {
+      if (e.target === elements.pdfReaderModal) closePdfModal();
     });
 
     // 睡眠定时器模态框
@@ -913,12 +1076,12 @@
         case 'ArrowUp':
           e.preventDefault();
           elements.audio.volume = Math.min(1, elements.audio.volume + 0.1);
-          elements.volumeSlider.value = elements.audio.volume;
+          if (elements.volumeSlider) elements.volumeSlider.value = elements.audio.volume;
           break;
         case 'ArrowDown':
           e.preventDefault();
           elements.audio.volume = Math.max(0, elements.audio.volume - 0.1);
-          elements.volumeSlider.value = elements.audio.volume;
+          if (elements.volumeSlider) elements.volumeSlider.value = elements.audio.volume;
           break;
         case '[':
         case ']':
@@ -926,7 +1089,7 @@
           break;
         case 'm':
         case 'M':
-          elements.muteBtn.click();
+          if (elements.muteBtn) elements.muteBtn.click();
           break;
         case 'n':
         case 'N':
@@ -937,6 +1100,7 @@
           elements.booksBtn.click();
           break;
         case 'Escape':
+          closePdfModal();
           elements.booksModal.style.display = 'none';
           elements.timerModal.style.display = 'none';
           elements.shortcutsModal.style.display = 'none';

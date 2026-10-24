@@ -1,28 +1,30 @@
 /* ==========================================================================
-   AI 学习音频随身听 - 现代沉浸式深色科技美学样式
+   AI 学习音频随身听 - 现代沉浸式深色科技美学样式 (Impeccable Production Grade)
    ========================================================================== */
 
 :root {
   --bg-main: #0a0e17;
-  --bg-card: rgba(18, 24, 38, 0.75);
-  --bg-card-hover: rgba(26, 34, 54, 0.85);
-  --border-glass: rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(99, 102, 241, 0.4);
+  --bg-card: rgba(18, 24, 38, 0.85);
+  --bg-card-hover: rgba(26, 36, 58, 0.95);
+  --bg-card-active: rgba(35, 45, 75, 0.95);
+  --border-glass: rgba(255, 255, 255, 0.1);
+  --border-focus: rgba(99, 102, 241, 0.5);
   
   --primary: #6366f1;
   --primary-light: #818cf8;
   --primary-glow: rgba(99, 102, 241, 0.35);
   --accent-purple: #8b5cf6;
   --accent-pink: #ec4899;
+  --accent-cyan: #38bdf8;
   --accent-emerald: #10b981;
   
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --text-dim: #64748b;
   
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
   --radius-full: 9999px;
   
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
@@ -52,18 +54,18 @@ body {
   filter: blur(140px);
   pointer-events: none;
   z-index: 0;
-  opacity: 0.3;
+  opacity: 0.25;
 }
 .glow-1 {
-  width: 450px;
-  height: 450px;
+  width: 480px;
+  height: 480px;
   background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
-  top: -100px;
+  top: -120px;
   right: -100px;
 }
 .glow-2 {
-  width: 400px;
-  height: 400px;
+  width: 420px;
+  height: 420px;
   background: radial-gradient(circle, var(--accent-purple) 0%, transparent 70%);
   bottom: -100px;
   left: -100px;
@@ -102,55 +104,53 @@ body {
   box-shadow: 0 4px 16px var(--primary-glow);
 }
 .app-title {
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #ffffff 40%, #cbd5e1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.01em;
+  color: #fff;
 }
 .app-subtitle {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
 }
 .header-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 /* 教材库导航按钮 */
 .books-nav-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(99, 102, 241, 0.12);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  color: var(--primary-light);
+  background: rgba(99, 102, 241, 0.16);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  color: #fff;
   padding: 8px 14px;
   border-radius: var(--radius-md);
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 .books-nav-btn:hover {
-  background: rgba(99, 102, 241, 0.22);
-  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.28);
+  border-color: var(--primary-light);
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px var(--primary-glow);
-  color: #fff;
+  box-shadow: 0 4px 16px var(--primary-glow);
 }
 .mini-count-badge {
   background: var(--primary);
   color: #fff;
-  font-size: 0.7rem;
-  padding: 1px 6px;
+  font-size: 0.72rem;
+  padding: 2px 7px;
   border-radius: var(--radius-full);
+  font-weight: 700;
 }
 
 .badge {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   padding: 6px 12px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-glass);
@@ -175,12 +175,12 @@ body {
 .icon-btn:hover {
   color: var(--text-main);
   background: var(--bg-card-hover);
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-1px);
 }
 .icon-btn.small {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
 }
 .timer-tag {
   position: absolute;
@@ -219,7 +219,7 @@ body {
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-md);
   padding: 10px 16px;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 .search-input-box:focus-within {
   border-color: var(--primary);
@@ -273,11 +273,11 @@ body {
   color: var(--primary-light);
 }
 
-/* 播放列表项 */
+/* 播放列表容器 */
 .playlist-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   max-height: calc(100vh - 270px);
   overflow-y: auto;
   padding-right: 6px;
@@ -289,48 +289,63 @@ body {
   background: rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-full);
 }
+
+/* 单个音频卡片 */
 .audio-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 18px;
+  padding: 14px 16px;
   background: var(--bg-card);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.22s ease;
-  backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
 }
 .audio-card:hover {
   background: var(--bg-card-hover);
-  border-color: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.18);
   transform: translateY(-1px);
 }
 .audio-card.active {
   background: rgba(99, 102, 241, 0.14);
   border-color: var(--primary);
-  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.22);
 }
 .audio-card-left {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   flex: 1;
   min-width: 0;
 }
-.order-num {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text-dim);
-  width: 24px;
-  text-align: center;
-  font-variant-numeric: tabular-nums;
+.card-play-trigger {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-glass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: all 0.2s;
 }
-.audio-card.active .order-num {
-  color: var(--primary-light);
+.audio-card:hover .card-play-trigger {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary-light);
+  transform: scale(1.05);
 }
+.audio-card.active .card-play-trigger {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary-light);
+}
+
 .card-content {
   flex: 1;
   min-width: 0;
@@ -353,7 +368,6 @@ body {
   gap: 8px;
   font-size: 0.78rem;
   color: var(--text-dim);
-  flex-wrap: wrap;
 }
 .progress-pill {
   color: var(--primary-light);
@@ -362,42 +376,40 @@ body {
   border-radius: var(--radius-sm);
   font-weight: 600;
 }
-.pdf-item-pill {
-  color: #38bdf8;
-  background: rgba(56, 189, 248, 0.12);
-  border: 1px solid rgba(56, 189, 248, 0.25);
-  padding: 1px 6px;
-  border-radius: var(--radius-sm);
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-}
-.pdf-item-pill:hover {
-  background: rgba(56, 189, 248, 0.25);
-  color: #fff;
-}
 
-.audio-card-right {
+/* 卡片右侧独立行动按钮群 */
+.audio-card-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   margin-left: 12px;
+  flex-shrink: 0;
 }
-.play-indicator-icon {
-  color: var(--text-dim);
+
+/* 核心行动点：列表上的“讲义”直达按钮 */
+.card-pdf-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
   transition: all 0.2s;
 }
-.audio-card:hover .play-indicator-icon {
-  color: var(--primary-light);
-  transform: scale(1.1);
+.card-pdf-action:hover {
+  background: #38bdf8;
+  color: #0b1120;
+  border-color: #38bdf8;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 10px rgba(56, 189, 248, 0.3);
 }
-.audio-card.active .play-indicator-icon {
-  color: var(--primary-light);
-}
+
+/* 卡片底部的收听进度线 */
 .card-progress-line {
   position: absolute;
   bottom: 0;
@@ -405,6 +417,34 @@ body {
   height: 3px;
   background: linear-gradient(90deg, var(--primary), var(--accent-purple));
   border-radius: 0 2px 2px 0;
+}
+
+/* 错误提示横幅 */
+.audio-error-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  color: #fca5a5;
+  font-size: 0.88rem;
+}
+.error-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.error-retry-btn {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 /* 本地拖拽上传区域 */
@@ -436,12 +476,14 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-lg);
-  padding: 26px 24px;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  padding: 24px 22px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
+}
+.mobile-sheet-handle {
+  display: none;
 }
 
 /* 波形律动 */
@@ -509,25 +551,33 @@ body {
   border-radius: var(--radius-sm);
   color: var(--text-muted);
 }
-.pdf-pill-link {
-  display: inline-flex;
+
+/* 醒目的英雄讲义行动栏 */
+.hero-pdf-action-box {
+  margin-top: -4px;
+}
+.hero-pdf-btn {
+  width: 100%;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.4);
   color: #38bdf8;
-  background: rgba(56, 189, 248, 0.12);
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  padding: 3px 10px;
-  border-radius: var(--radius-sm);
-  text-decoration: none;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
   transition: all 0.2s ease;
 }
-.pdf-pill-link:hover {
-  background: rgba(56, 189, 248, 0.25);
+.hero-pdf-btn:hover {
+  background: #38bdf8;
+  color: #0b1120;
   border-color: #38bdf8;
-  color: #fff;
   transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.35);
 }
 
 /* 进度条 */
@@ -583,7 +633,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 8px;
+  padding: 4px 4px;
 }
 .control-btn {
   background: none;
@@ -622,22 +672,41 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 .main-play-btn:hover {
   transform: scale(1.06);
   box-shadow: 0 8px 24px rgba(99, 102, 241, 0.5);
+}
+.play-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
 /* 倍速控制器 */
 .speed-control-box {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+}
+.speed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .control-sublabel {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
   font-weight: 600;
+}
+.speed-current-val {
+  font-size: 0.82rem;
+  color: var(--primary-light);
+  font-weight: 700;
 }
 .speed-selector {
   display: grid;
@@ -649,7 +718,7 @@ body {
   border: 1px solid var(--border-glass);
   color: var(--text-muted);
   font-size: 0.8rem;
-  padding: 6px 0;
+  padding: 7px 0;
   border-radius: var(--radius-sm);
   cursor: pointer;
   font-weight: 600;
@@ -691,17 +760,144 @@ body {
   cursor: pointer;
   transition: transform 0.15s;
 }
-.volume-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.3);
+
+/* ==========================================================================
+   全屏/宽屏内嵌 PDF 讲义阅读器 Modal (边听边看核心)
+   ========================================================================== */
+.pdf-viewer-modal {
+  padding: 16px;
+  z-index: 200;
+}
+.pdf-modal-container {
+  background: #111624;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 1040px;
+  height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+}
+.pdf-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px;
+  background: #161c2e;
+  border-bottom: 1px solid var(--border-glass);
+}
+.pdf-modal-title-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+.pdf-badge {
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+.pdf-modal-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pdf-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.pdf-action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.pdf-action-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+.pdf-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+}
+.pdf-close-btn:hover {
+  color: #fff;
+}
+.pdf-frame-wrapper {
+  flex: 1;
+  position: relative;
+  background: #1a2030;
+}
+.pdf-loading-indicator {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--text-dim);
+  font-size: 0.88rem;
+}
+.pdf-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+.pdf-mobile-fallback {
+  padding: 14px 18px;
+  background: #161c2e;
+  border-top: 1px solid var(--border-glass);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.pdf-direct-open-btn {
+  background: var(--primary);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  text-decoration: none;
+  flex-shrink: 0;
 }
 
-/* 模态框通用 */
+/* 教材库弹层 */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(8px);
-  z-index: 100;
+  z-index: 150;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -741,7 +937,7 @@ body {
   background: none;
   border: none;
   color: var(--text-dim);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   cursor: pointer;
 }
 .close-modal-btn:hover {
@@ -753,7 +949,7 @@ body {
   margin-bottom: 16px;
 }
 
-/* 教材网格 */
+/* 教材列表项 */
 .books-grid {
   display: flex;
   flex-direction: column;
@@ -833,13 +1029,14 @@ body {
   text-decoration: none;
   cursor: pointer;
   transition: all 0.2s;
+  border: none;
 }
 .book-action-btn.read-btn {
-  background: var(--primary);
-  color: #fff;
+  background: #38bdf8;
+  color: #0b1120;
 }
 .book-action-btn.read-btn:hover {
-  background: var(--primary-light);
+  background: #7dd3fc;
   transform: translateY(-1px);
 }
 .book-action-btn.download-btn {
@@ -920,55 +1117,125 @@ kbd {
 }
 
 /* ==========================================================================
-   响应式移动端适配（屏幕宽度 <= 880px）
+   响应式移动端深度适配（屏幕宽度 <= 880px）
    ========================================================================== */
 @media (max-width: 880px) {
   .app-layout {
-    padding: 16px 14px 140px 14px;
+    padding: 14px 12px 180px 12px; /* 底部预留底栏空间 */
   }
   .app-header {
     flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+  }
+  .app-title {
+    font-size: 1.15rem;
+  }
+  .app-subtitle {
+    font-size: 0.75rem;
   }
   .header-right {
     width: 100%;
     justify-content: space-between;
   }
+  .btn-text {
+    display: inline;
+  }
+  
   .main-content {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 14px;
   }
   .playlist-container {
     max-height: none;
     overflow-y: visible;
+    gap: 10px;
   }
-  /* 移动端播放卡片浮动在底部 */
+  .audio-card {
+    padding: 12px 14px;
+  }
+  .card-title {
+    font-size: 0.92rem;
+  }
+  .card-pdf-action {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+  }
+
+  /* 移动端播放底栏：沉浸可伸缩底栏 */
   .player-section {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     top: auto;
-    z-index: 50;
-    padding: 0 12px 14px 12px;
+    z-index: 100;
+    padding: 0;
   }
   .player-card {
-    border-radius: var(--radius-lg);
-    padding: 16px;
+    border-radius: 20px 20px 0 0;
+    padding: 14px 18px calc(14px + env(safe-area-inset-bottom, 0px)) 18px;
+    background: rgba(14, 20, 32, 0.98);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: none;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.8);
     gap: 12px;
-    background: rgba(14, 20, 32, 0.94);
-    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.7);
+  }
+  
+  /* 移动端顶部拉手 */
+  .mobile-sheet-handle {
+    display: flex;
+    justify-content: center;
+    padding: 0 0 6px 0;
+    cursor: pointer;
+  }
+  .handle-bar {
+    width: 36px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 2px;
+  }
+
+  .player-header {
+    margin-bottom: -4px;
   }
   .track-title {
-    font-size: 1rem;
+    font-size: 0.95rem;
     -webkit-line-clamp: 1;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
   }
+  .hero-pdf-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+  
+  /* 倍速按钮：移动端采用 4x2 网格，每格易触达 */
   .speed-selector {
-    grid-template-columns: repeat(8, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
   }
+  .speed-pill {
+    padding: 8px 0;
+    font-size: 0.8rem;
+  }
+  
   .volume-box {
-    display: none;
+    display: none; /* 移动端靠手机实体键调节 */
+  }
+
+  /* 全屏 PDF 模态框移动端适配 */
+  .pdf-viewer-modal {
+    padding: 0;
+  }
+  .pdf-modal-container {
+    height: 100vh;
+    height: 100dvh;
+    border-radius: 0;
+    max-width: none;
+  }
+  .pdf-modal-actions .pdf-action-link span {
+    display: none; /* 移动端仅保留图标节省空间 */
   }
 }

@@ -2,11 +2,11 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AI 学习音频随身听 | 沉浸式收听与配套教材库</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>AI 学习音频随身听 | 沉浸式收听与配套教材讲义</title>
   <meta name="description" content="专为AI与大模型课程打造的极简高效音频播放器，支持3x倍速、断点续播、锁屏控制及配套PDF讲义在线阅读">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20261025_01">
 </head>
 <body>
   <!-- 背景氛围光影 -->
@@ -18,18 +18,19 @@
     <header class="app-header">
       <div class="header-left">
         <img src="assets/logo.svg" alt="Logo" class="app-logo">
-        <div>
-          <h1 class="app-title">AI 学习音频与教材库</h1>
-          <p class="app-subtitle">深度学习 · 大模型 · 智能体前沿音频与配套讲义</p>
+        <div class="header-title-box">
+          <h1 class="app-title">AI 学习音频与讲义库</h1>
+          <p class="app-subtitle">大模型 · 智能体前沿音频 + 1对1配套PDF教材</p>
         </div>
       </div>
       <div class="header-right">
-        <button class="books-nav-btn" id="booksBtn" title="查看全部配套教材与讲义">
+        <!-- 核心入口：全部教材与讲义全集 -->
+        <button class="books-nav-btn" id="booksBtn" title="查看全套 13 本教材与讲义库">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
             <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
           </svg>
-          <span>配套教材库</span>
+          <span class="btn-text">📚 配套教材库</span>
           <span class="mini-count-badge" id="booksCountBadge">13本</span>
         </button>
         <span class="badge" id="audioCountBadge">13 期音频</span>
@@ -65,7 +66,7 @@
         </div>
 
         <div class="list-header-info">
-          <span id="filteredCount">全部音频</span>
+          <span id="filteredCount">全部音频 (13)</span>
           <div class="list-actions">
             <button class="text-btn" id="sortOrderBtn" title="切换正序/倒序">序号排序 ↕</button>
           </div>
@@ -75,25 +76,39 @@
         <div class="playlist-container" id="playlistContainer">
           <div class="loading-state" id="loadingState">
             <div class="spinner"></div>
-            <p>正在载入音频库...</p>
+            <p>正在载入音频库与教材清单...</p>
           </div>
+        </div>
+
+        <!-- 错误提示横幅 (默认隐藏) -->
+        <div class="audio-error-banner" id="audioErrorBanner" style="display: none;">
+          <div class="error-content">
+            <span class="error-icon">⚠️</span>
+            <span id="audioErrorMsg">音频加载被拦截或缓冲异常</span>
+          </div>
+          <button class="error-retry-btn" id="audioRetryBtn">立即重试</button>
         </div>
 
         <!-- 底部本地拖拽音频试听提示 -->
         <div class="drop-zone" id="dropZone">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="17 8 12 3 7 8" />
             <line x1="12" y1="3" x2="12" y2="15" />
           </svg>
-          <span>将桌面新 .m4a 拖入此处可直接本地即时试听</span>
+          <span>将本地新 .m4a 拖入此处可即时试听</span>
           <input type="file" id="localFileInput" accept=".m4a,audio/*" style="display: none;">
         </div>
       </section>
 
       <!-- 右栏/底栏：核心控制台与沉浸播放器 -->
       <aside class="player-section" id="playerSection">
-        <div class="player-card">
+        <div class="player-card" id="playerCard">
+          <!-- 移动端专享：收起/展开把手 -->
+          <div class="mobile-sheet-handle" id="mobileSheetHandle">
+            <span class="handle-bar"></span>
+          </div>
+
           <!-- 顶部状态与动态波形 -->
           <div class="player-header">
             <div class="waveform-box" id="waveformBox">
@@ -110,22 +125,24 @@
 
           <!-- 当前曲目信息 -->
           <div class="track-info">
-            <h2 class="track-title" id="currentTrackTitle">请选择要收听的音频</h2>
+            <h2 class="track-title" id="currentTrackTitle">请点击左侧列表选择音频</h2>
             <div class="track-meta">
               <span class="meta-tag" id="currentTrackSize">-- MB</span>
               <span class="meta-tag" id="currentTrackProgressTag">尚未开始</span>
-              <!-- 本章配套 PDF 讲义快捷入口 -->
-              <a href="#" target="_blank" class="pdf-pill-link" id="currentTrackPdfBtn" style="display: none;" title="在新标签页中打开本章配套 PDF 讲义">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
-                  <line x1="16" y1="13" x2="8" y2="13"/>
-                  <line x1="16" y1="17" x2="8" y2="17"/>
-                  <polyline points="10 9 9 9 8 9"/>
-                </svg>
-                <span>📖 打开本章讲义 (PDF)</span>
-              </a>
             </div>
+          </div>
+
+          <!-- 醒目的“查看本章讲义”行动召唤区 -->
+          <div class="hero-pdf-action-box" id="heroPdfBox" style="display: none;">
+            <button class="hero-pdf-btn" id="currentTrackPdfBtn" title="查看本章配套讲义">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+              <span class="hero-pdf-text" id="currentTrackPdfText">📖 打开本章配套讲义 (PDF)</span>
+            </button>
           </div>
 
           <!-- 进度条与时间显示 -->
@@ -163,7 +180,7 @@
             </button>
 
             <!-- 主播放/暂停按钮 -->
-            <button class="control-btn main-play-btn" id="playPauseBtn" title="播放/暂停 (空格)">
+            <button class="control-btn main-play-btn" id="playPauseBtn" title="播放/暂停 (空格)" aria-label="播放或暂停">
               <svg class="play-icon" id="playIcon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
                 <polygon points="5 3 19 12 5 21 5 3"/>
               </svg>
@@ -171,6 +188,7 @@
                 <rect x="6" y="4" width="4" height="16"/>
                 <rect x="14" y="4" width="4" height="16"/>
               </svg>
+              <div class="play-spinner" id="playSpinner" style="display: none;"></div>
             </button>
 
             <!-- 快进 15 秒 -->
@@ -192,7 +210,10 @@
 
           <!-- 学习倍速选择区 -->
           <div class="speed-control-box">
-            <span class="control-sublabel">学习倍速：</span>
+            <div class="speed-header">
+              <span class="control-sublabel">学习倍速</span>
+              <span class="speed-current-val" id="currentSpeedVal">1.0x</span>
+            </div>
             <div class="speed-selector" id="speedSelector">
               <button class="speed-pill" data-speed="0.75">0.75x</button>
               <button class="speed-pill active" data-speed="1.0">1.0x</button>
@@ -205,7 +226,7 @@
             </div>
           </div>
 
-          <!-- 音量控制 -->
+          <!-- 音量控制 (桌面端) -->
           <div class="volume-box">
             <button class="icon-btn small" id="muteBtn" title="静音/恢复">
               <svg id="volumeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -220,8 +241,50 @@
     </main>
   </div>
 
-  <!-- 原生隐藏 audio 标签 -->
-  <audio id="audioPlayer" preload="metadata"></audio>
+  <!-- 原生隐藏 audio 标签，配置完备移动端内联播放属性 -->
+  <audio id="audioPlayer" preload="auto" playsinline webkit-playsinline x5-playsinline></audio>
+
+  <!-- 全功能内嵌 PDF 阅读器弹层 (边听边看核心：不跳出页面、不断音) -->
+  <div class="modal-overlay pdf-viewer-modal" id="pdfReaderModal" style="display: none;">
+    <div class="pdf-modal-container">
+      <div class="pdf-modal-header">
+        <div class="pdf-modal-title-box">
+          <span class="pdf-badge">PDF 讲义</span>
+          <h3 class="pdf-modal-title" id="pdfReaderTitle">讲义阅读器</h3>
+        </div>
+        <div class="pdf-modal-actions">
+          <a href="#" target="_blank" rel="noopener noreferrer" class="pdf-action-link" id="pdfExternalLink" title="在新标签页中打开">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+            <span>新窗口打开</span>
+          </a>
+          <a href="#" download class="pdf-action-link" id="pdfDownloadLink" title="下载至本地">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            <span>下载</span>
+          </a>
+          <button class="pdf-close-btn" id="closePdfModal" title="关闭讲义">✕</button>
+        </div>
+      </div>
+      <div class="pdf-frame-wrapper" id="pdfFrameWrapper">
+        <div class="pdf-loading-indicator" id="pdfLoadingIndicator">
+          <div class="spinner"></div>
+          <p>正在载入讲义内容...</p>
+        </div>
+        <iframe id="pdfIframe" src="" class="pdf-iframe" frameborder="0"></iframe>
+      </div>
+      <div class="pdf-mobile-fallback" id="pdfMobileFallback" style="display: none;">
+        <p>若移动端内置预览未正常显示，可点击下方直接在新页面阅读：</p>
+        <a href="#" id="pdfDirectBtn" class="pdf-direct-open-btn">直接打开本章讲义 ↗</a>
+      </div>
+    </div>
+  </div>
 
   <!-- 全套教材与讲义资料库弹层 -->
   <div class="modal-overlay" id="booksModal" style="display: none;">
@@ -232,11 +295,11 @@
             <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
             <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
           </svg>
-          <h3>配套教材与讲义全集</h3>
+          <h3>配套教材与讲义全集 (共 13 本)</h3>
         </div>
         <button class="close-modal-btn" id="closeBooksModal">✕</button>
       </div>
-      <p class="modal-desc">边听音频边看教材图解效果更佳。支持直接在浏览器在线阅读，或保存至本地设备。</p>
+      <p class="modal-desc">边听音频边看教材图解，学习效率倍增。点击即可在应用内无缝查阅，音频不会中断。</p>
       <div class="books-grid" id="booksGrid">
         <div class="loading-state">
           <div class="spinner"></div>
@@ -280,10 +343,11 @@
         <div class="shortcut-item"><kbd>[</kbd> / <kbd>]</kbd><span>降低 / 增加倍速</span></div>
         <div class="shortcut-item"><kbd>M</kbd><span>静音 / 恢复</span></div>
         <div class="shortcut-item"><kbd>N</kbd><span>下一首音频</span></div>
+        <div class="shortcut-item"><kbd>B</kbd><span>打开教材库</span></div>
       </div>
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=20261025_01"></script>
 </body>
 </html>
