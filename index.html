@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AI 学习音频随身听 | 沉浸式收听库</title>
-  <meta name="description" content="专为AI与大模型课程打造的极简高效音频播放器，支持3x倍速、断点续播、锁屏控制">
+  <title>AI 学习音频随身听 | 沉浸式收听与配套教材库</title>
+  <meta name="description" content="专为AI与大模型课程打造的极简高效音频播放器，支持3x倍速、断点续播、锁屏控制及配套PDF讲义在线阅读">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -19,11 +19,19 @@
       <div class="header-left">
         <img src="assets/logo.svg" alt="Logo" class="app-logo">
         <div>
-          <h1 class="app-title">AI 学习音频库</h1>
-          <p class="app-subtitle">深度学习 · 大模型 · 智能体前沿音频整理</p>
+          <h1 class="app-title">AI 学习音频与教材库</h1>
+          <p class="app-subtitle">深度学习 · 大模型 · 智能体前沿音频与配套讲义</p>
         </div>
       </div>
       <div class="header-right">
+        <button class="books-nav-btn" id="booksBtn" title="查看全部配套教材与讲义">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          <span>配套教材库</span>
+          <span class="mini-count-badge" id="booksCountBadge">13本</span>
+        </button>
         <span class="badge" id="audioCountBadge">13 期音频</span>
         <button class="icon-btn" id="shortcutsBtn" title="键盘快捷键" aria-label="快捷键说明">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -65,7 +73,6 @@
 
         <!-- 音频列表容器 -->
         <div class="playlist-container" id="playlistContainer">
-          <!-- 动态渲染音频卡片 -->
           <div class="loading-state" id="loadingState">
             <div class="spinner"></div>
             <p>正在载入音频库...</p>
@@ -107,6 +114,17 @@
             <div class="track-meta">
               <span class="meta-tag" id="currentTrackSize">-- MB</span>
               <span class="meta-tag" id="currentTrackProgressTag">尚未开始</span>
+              <!-- 本章配套 PDF 讲义快捷入口 -->
+              <a href="#" target="_blank" class="pdf-pill-link" id="currentTrackPdfBtn" style="display: none;" title="在新标签页中打开本章配套 PDF 讲义">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
+                <span>📖 打开本章讲义 (PDF)</span>
+              </a>
             </div>
           </div>
 
@@ -204,6 +222,29 @@
 
   <!-- 原生隐藏 audio 标签 -->
   <audio id="audioPlayer" preload="metadata"></audio>
+
+  <!-- 全套教材与讲义资料库弹层 -->
+  <div class="modal-overlay" id="booksModal" style="display: none;">
+    <div class="modal-card wide-modal">
+      <div class="modal-header">
+        <div class="modal-title-with-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary-light)" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          <h3>配套教材与讲义全集</h3>
+        </div>
+        <button class="close-modal-btn" id="closeBooksModal">✕</button>
+      </div>
+      <p class="modal-desc">边听音频边看教材图解效果更佳。支持直接在浏览器在线阅读，或保存至本地设备。</p>
+      <div class="books-grid" id="booksGrid">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>正在载入教材列表...</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- 睡眠定时弹层 -->
   <div class="modal-overlay" id="timerModal" style="display: none;">

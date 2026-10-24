@@ -1,0 +1,132 @@
+[
+  {
+    "id": "book-02",
+    "filename": "总《动手学大模型》完整教程.pdf",
+    "title": "总《动手学大模型》完整教程",
+    "url": "books/%E6%80%BB%E3%80%8A%E5%8A%A8%E6%89%8B%E5%AD%A6%E5%A4%A7%E6%A8%A1%E5%9E%8B%E3%80%8B%E5%AE%8C%E6%95%B4%E6%95%99%E7%A8%8B.pdf",
+    "size": 65572777,
+    "sizeFormatted": "62.54 MB",
+    "isGeneral": true,
+    "order": 100
+  },
+  {
+    "id": "book-01",
+    "filename": "总AI Agent 实战营（简体中文）.pdf",
+    "title": "总AI Agent 实战营（简体中文）",
+    "url": "books/%E6%80%BBAI%20Agent%20%E5%AE%9E%E6%88%98%E8%90%A5%EF%BC%88%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%EF%BC%89.pdf",
+    "size": 10015439,
+    "sizeFormatted": "9.55 MB",
+    "isGeneral": true,
+    "order": 100
+  },
+  {
+    "id": "book-03",
+    "filename": "第01章_微调与部署.pdf",
+    "title": "第01章_微调与部署",
+    "url": "books/%E7%AC%AC01%E7%AB%A0_%E5%BE%AE%E8%B0%83%E4%B8%8E%E9%83%A8%E7%BD%B2.pdf",
+    "size": 11337756,
+    "sizeFormatted": "10.81 MB",
+    "isGeneral": false,
+    "order": 1
+  },
+  {
+    "id": "book-04",
+    "filename": "第02章_提示学习与思维链.pdf",
+    "title": "第02章_提示学习与思维链",
+    "url": "books/%E7%AC%AC02%E7%AB%A0_%E6%8F%90%E7%A4%BA%E5%AD%A6%E4%B9%A0%E4%B8%8E%E6%80%9D%E7%BB%B4%E9%93%BE.pdf",
+    "size": 8732687,
+    "sizeFormatted": "8.33 MB",
+    "isGeneral": false,
+    "order": 2
+  },
+  {
+    "id": "book-05",
+    "filename": "第03章_知识编辑.pdf",
+    "title": "第03章_知识编辑",
+    "url": "books/%E7%AC%AC03%E7%AB%A0_%E7%9F%A5%E8%AF%86%E7%BC%96%E8%BE%91.pdf",
+    "size": 3363452,
+    "sizeFormatted": "3.21 MB",
+    "isGeneral": false,
+    "order": 3
+  },
+  {
+    "id": "book-06",
+    "filename": "第04章_数学推理.pdf",
+    "title": "第04章_数学推理",
+    "url": "books/%E7%AC%AC04%E7%AB%A0_%E6%95%B0%E5%AD%A6%E6%8E%A8%E7%90%86.pdf",
+    "size": 4274021,
+    "sizeFormatted": "4.08 MB",
+    "isGeneral": false,
+    "order": 4
+  },
+  {
+    "id": "book-07",
+    "filename": "第05章_模型水印.pdf",
+    "title": "第05章_模型水印",
+    "url": "books/%E7%AC%AC05%E7%AB%A0_%E6%A8%A1%E5%9E%8B%E6%B0%B4%E5%8D%B0.pdf",
+    "size": 3379615,
+    "sizeFormatted": "3.22 MB",
+    "isGeneral": false,
+    "order": 5
+  },
+  {
+    "id": "book-08",
+    "filename": "第06章_越狱攻击.pdf",
+    "title": "第06章_越狱攻击",
+    "url": "books/%E7%AC%AC06%E7%AB%A0_%E8%B6%8A%E7%8B%B1%E6%94%BB%E5%87%BB.pdf",
+    "size": 8196045,
+    "sizeFormatted": "7.82 MB",
+    "isGeneral": false,
+    "order": 6
+  },
+  {
+    "id": "book-09",
+    "filename": "第07章_大模型隐写.pdf",
+    "title": "第07章_大模型隐写",
+    "url": "books/%E7%AC%AC07%E7%AB%A0_%E5%A4%A7%E6%A8%A1%E5%9E%8B%E9%9A%90%E5%86%99.pdf",
+    "size": 521910,
+    "sizeFormatted": "509.68 KB",
+    "isGeneral": false,
+    "order": 7
+  },
+  {
+    "id": "book-10",
+    "filename": "第08章_多模态模型.pdf",
+    "title": "第08章_多模态模型",
+    "url": "books/%E7%AC%AC08%E7%AB%A0_%E5%A4%9A%E6%A8%A1%E6%80%81%E6%A8%A1%E5%9E%8B.pdf",
+    "size": 9113241,
+    "sizeFormatted": "8.69 MB",
+    "isGeneral": false,
+    "order": 8
+  },
+  {
+    "id": "book-11",
+    "filename": "第09章_GUI 智能体.pdf",
+    "title": "第09章_GUI 智能体",
+    "url": "books/%E7%AC%AC09%E7%AB%A0_GUI%20%E6%99%BA%E8%83%BD%E4%BD%93.pdf",
+    "size": 6611499,
+    "sizeFormatted": "6.31 MB",
+    "isGeneral": false,
+    "order": 9
+  },
+  {
+    "id": "book-12",
+    "filename": "第10章_智能体安全.pdf",
+    "title": "第10章_智能体安全",
+    "url": "books/%E7%AC%AC10%E7%AB%A0_%E6%99%BA%E8%83%BD%E4%BD%93%E5%AE%89%E5%85%A8.pdf",
+    "size": 7969400,
+    "sizeFormatted": "7.6 MB",
+    "isGeneral": false,
+    "order": 10
+  },
+  {
+    "id": "book-13",
+    "filename": "第11章_RLHF 安全对齐.pdf",
+    "title": "第11章_RLHF 安全对齐",
+    "url": "books/%E7%AC%AC11%E7%AB%A0_RLHF%20%E5%AE%89%E5%85%A8%E5%AF%B9%E9%BD%90.pdf",
+    "size": 2078243,
+    "sizeFormatted": "1.98 MB",
+    "isGeneral": false,
+    "order": 11
+  }
+]

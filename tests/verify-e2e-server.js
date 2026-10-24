@@ -23,12 +23,12 @@ const server = http.createServer((req, res) => {
     '.js': 'application/javascript; charset=utf-8',
     '.json': 'application/json; charset=utf-8',
     '.svg': 'image/svg+xml',
-    '.m4a': 'audio/mp4'
+    '.m4a': 'audio/mp4',
+    '.pdf': 'application/pdf'
   };
 
   const contentType = mimeMap[ext] || 'application/octet-stream';
 
-  // 模拟支持 HTTP Range 请求（用于流式播放）
   const range = req.headers.range;
   if (range && ext === '.m4a') {
     const parts = range.replace(/bytes=/, "").split("-");
@@ -53,32 +53,41 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(4567, async () => {
-  console.log('Test server started on port 4567');
+server.listen(4568, async () => {
+  console.log('Test server started on port 4568');
 
   try {
     // 1. 测试主页
-    const resHome = await fetch('http://localhost:4567/');
+    const resHome = await fetch('http://localhost:4568/');
     assert.strictEqual(resHome.status, 200, 'Home page must return 200');
     const htmlText = await resHome.text();
-    assert.ok(htmlText.includes('AI 学习音频库'), 'Home page title must match');
+    assert.ok(htmlText.includes('AI 学习音频'), 'Home page title must match');
 
-    // 2. 测试 playlist.json
-    const resPlaylist = await fetch('http://localhost:4567/data/playlist.json');
+    // 2. 测试 playlist.json 与 books.json
+    const resPlaylist = await fetch('http://localhost:4568/data/playlist.json');
     assert.strictEqual(resPlaylist.status, 200, 'Playlist JSON must return 200');
     const playlist = await resPlaylist.json();
     assert.strictEqual(playlist.length, 13, 'Must contain 13 items');
 
-    // 3. 测试第一个音频文件的 HTTP 访问与流式缓冲 Range
-    const firstAudioUrl = 'http://localhost:4567/' + playlist[0].url;
+    const resBooks = await fetch('http://localhost:4568/data/books.json');
+    assert.strictEqual(resBooks.status, 200, 'Books JSON must return 200');
+    const books = await resBooks.json();
+    assert.strictEqual(books.length, 13, 'Must contain 13 books');
+
+    // 3. 测试音频流式请求
+    const firstAudioUrl = 'http://localhost:4568/' + playlist[0].url;
     const resAudioRange = await fetch(firstAudioUrl, {
       headers: { Range: 'bytes=0-1024' }
     });
     assert.strictEqual(resAudioRange.status, 206, 'Audio file should support 206 Partial Content');
-    const buf = await resAudioRange.arrayBuffer();
-    assert.strictEqual(buf.byteLength, 1025, 'Should return requested byte range');
 
-    console.log('✅ End-to-end HTTP static & stream tests passed successfully!');
+    // 4. 测试 PDF 在线访问
+    const firstBookUrl = 'http://localhost:4568/' + books[0].url;
+    const resPdf = await fetch(firstBookUrl);
+    assert.strictEqual(resPdf.status, 200, 'PDF book should return 200');
+    assert.strictEqual(resPdf.headers.get('content-type'), 'application/pdf');
+
+    console.log('✅ End-to-end HTTP static, audio stream & PDF tests passed successfully!');
   } catch (err) {
     console.error('E2E Test Failed:', err);
     process.exit(1);

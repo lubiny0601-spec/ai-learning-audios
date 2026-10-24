@@ -1,5 +1,5 @@
 /**
- * AI 学习音频随身听 - 核心播放引擎与交互逻辑
+ * AI 学习音频随身听 - 核心播放引擎、断点记忆与教材库联动
  */
 
 (function () {
@@ -31,6 +31,7 @@
   const state = {
     playlist: [],
     filteredList: [],
+    books: [],
     currentIndex: -1,
     currentTrack: null,
     isPlaying: false,
@@ -63,6 +64,7 @@
     currentTrackTitle: document.getElementById('currentTrackTitle'),
     currentTrackSize: document.getElementById('currentTrackSize'),
     currentTrackProgressTag: document.getElementById('currentTrackProgressTag'),
+    currentTrackPdfBtn: document.getElementById('currentTrackPdfBtn'),
     
     // 进度条
     progressBarContainer: document.getElementById('progressBarContainer'),
@@ -90,7 +92,14 @@
     dropZone: document.getElementById('dropZone'),
     localFileInput: document.getElementById('localFileInput'),
     
-    // 弹层
+    // 教材库
+    booksBtn: document.getElementById('booksBtn'),
+    booksCountBadge: document.getElementById('booksCountBadge'),
+    booksModal: document.getElementById('booksModal'),
+    closeBooksModal: document.getElementById('closeBooksModal'),
+    booksGrid: document.getElementById('booksGrid'),
+    
+    // 睡眠与快捷键弹层
     sleepTimerBtn: document.getElementById('sleepTimerBtn'),
     timerTag: document.getElementById('timerTag'),
     timerModal: document.getElementById('timerModal'),
@@ -129,6 +138,7 @@
     setupMediaSession();
     restoreSettings();
 
+    // 1. 加载音频清单
     try {
       const response = await fetch('data/playlist.json');
       if (!response.ok) throw new Error('Failed to load playlist.json');
@@ -151,9 +161,21 @@
       console.error('音频清单加载异常:', err);
       elements.playlistContainer.innerHTML = `
         <div class="loading-state">
-          <p style="color: #ef4444;">音频清单加载失败，请检查网络或刷新重试</p>
+          <p style="color: #ef4444;">音频清单加载失败，请刷新重试</p>
         </div>
       `;
+    }
+
+    // 2. 加载教材书籍库
+    try {
+      const booksRes = await fetch('data/books.json');
+      if (booksRes.ok) {
+        state.books = await booksRes.json();
+        elements.booksCountBadge.textContent = `${state.books.length}本`;
+        renderBooksModal();
+      }
+    } catch (e) {
+      console.warn('教材清单加载异常:', e);
     }
   }
 
@@ -201,6 +223,19 @@
           : `<span class="progress-pill">已学 ${pct}%</span>`;
       }
 
+      let pdfPill = '';
+      if (track.pdfUrl) {
+        pdfPill = `
+          <a href="${track.pdfUrl}" target="_blank" class="pdf-item-pill" title="查看配套讲义 PDF" onclick="event.stopPropagation()">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            <span>讲义</span>
+          </a>
+        `;
+      }
+
       return `
         <div class="audio-card ${isActive ? 'active' : ''}" data-id="${track.id}">
           <div class="audio-card-left">
@@ -210,6 +245,7 @@
               <div class="card-subtext">
                 <span>${track.sizeFormatted || ''}</span>
                 ${progressTag}
+                ${pdfPill}
               </div>
             </div>
           </div>
@@ -247,6 +283,45 @@
   }
 
   // ==========================================
+  // 教材资料库弹层渲染
+  // ==========================================
+  function renderBooksModal() {
+    if (state.books.length === 0) {
+      elements.booksGrid.innerHTML = '<p class="modal-desc">暂无可用教材</p>';
+      return;
+    }
+
+    const html = state.books.map(book => {
+      return `
+        <div class="book-item-card ${book.isGeneral ? 'general' : ''}">
+          <div class="book-info-left">
+            <div class="book-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              </svg>
+            </div>
+            <div class="book-title-wrap">
+              <div class="book-title" title="${book.title}">${book.isGeneral ? '⭐ ' : ''}${book.title}</div>
+              <div class="book-size">${book.sizeFormatted} · PDF 格式</div>
+            </div>
+          </div>
+          <div class="book-actions-right">
+            <a href="${book.url}" target="_blank" class="book-action-btn read-btn" title="在浏览器新标签页中打开阅读">
+              在线阅读
+            </a>
+            <a href="${book.url}" download="${book.filename}" class="book-action-btn download-btn" title="下载至本地">
+              下载
+            </a>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    elements.booksGrid.innerHTML = html;
+  }
+
+  // ==========================================
   // 核心播放控制
   // ==========================================
   function loadTrack(index, autoPlay = true) {
@@ -261,6 +336,14 @@
     elements.currentTrackTitle.textContent = track.title;
     elements.currentTrackTitle.title = track.title;
     elements.currentTrackSize.textContent = track.sizeFormatted || '';
+
+    // 检查是否有配套讲义
+    if (track.pdfUrl) {
+      elements.currentTrackPdfBtn.href = track.pdfUrl;
+      elements.currentTrackPdfBtn.style.display = 'inline-flex';
+    } else {
+      elements.currentTrackPdfBtn.style.display = 'none';
+    }
 
     // 检查历史断点
     const saved = state.progressMap[track.id];
@@ -376,7 +459,6 @@
 
   function playPreviousTrack() {
     if (state.playlist.length === 0) return;
-    // 如果播放超过 3 秒，先回到本曲开头
     if (elements.audio.currentTime > 3) {
       elements.audio.currentTime = 0;
       return;
@@ -399,7 +481,6 @@
     }
     localStorage.setItem(STORAGE_KEYS.SPEED, speed);
 
-    // 更新按钮状态
     const buttons = elements.speedSelector.querySelectorAll('.speed-pill');
     buttons.forEach(btn => {
       const s = parseFloat(btn.dataset.speed);
@@ -477,7 +558,6 @@
         </svg>
       `;
     } else {
-      // 顺序播放
       iconSvg = `
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="4" y1="6" x2="20" y2="6" />
@@ -506,7 +586,6 @@
     }
 
     if (minutes === -1) {
-      // 播完当前停止
       state.stopOnTrackEnd = true;
       elements.timerTag.textContent = '本期';
       elements.timerTag.style.display = 'block';
@@ -579,7 +658,8 @@
       url: url,
       size: file.size,
       sizeFormatted: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
-      order: 0
+      order: 0,
+      pdfUrl: null
     };
 
     state.playlist.unshift(localTrack);
@@ -759,7 +839,18 @@
       }
     });
 
-    // 模态框事件
+    // 教材库模态框
+    elements.booksBtn.addEventListener('click', () => {
+      elements.booksModal.style.display = 'flex';
+    });
+    elements.closeBooksModal.addEventListener('click', () => {
+      elements.booksModal.style.display = 'none';
+    });
+    elements.booksModal.addEventListener('click', (e) => {
+      if (e.target === elements.booksModal) elements.booksModal.style.display = 'none';
+    });
+
+    // 睡眠定时器模态框
     elements.sleepTimerBtn.addEventListener('click', () => {
       elements.timerModal.style.display = 'flex';
     });
@@ -770,7 +861,6 @@
       if (e.target === elements.timerModal) elements.timerModal.style.display = 'none';
     });
 
-    // 定时器选项点击
     elements.timerModal.querySelectorAll('.timer-opt-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const mins = parseInt(btn.dataset.minutes, 10);
@@ -781,6 +871,7 @@
       });
     });
 
+    // 快捷键指南模态框
     elements.shortcutsBtn.addEventListener('click', () => {
       elements.shortcutsModal.style.display = 'flex';
     });
@@ -793,11 +884,8 @@
 
     // 键盘全局快捷键
     window.addEventListener('keydown', (e) => {
-      // 如果正在输入搜索框，不响应快捷键
       if (document.activeElement === elements.searchInput) {
-        if (e.key === 'Escape') {
-          elements.searchInput.blur();
-        }
+        if (e.key === 'Escape') elements.searchInput.blur();
         return;
       }
 
@@ -844,7 +932,12 @@
         case 'N':
           playNextTrack();
           break;
+        case 'b':
+        case 'B':
+          elements.booksBtn.click();
+          break;
         case 'Escape':
+          elements.booksModal.style.display = 'none';
           elements.timerModal.style.display = 'none';
           elements.shortcutsModal.style.display = 'none';
           break;
